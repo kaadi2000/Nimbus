@@ -5,6 +5,8 @@ from tqdm import tqdm
 import zipfile
 import logging
 
+# Add logging configuration later especially for verification steps. 
+# I believe print statements are sufficient for now but from user perspective logging would be better.
 
 MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-en-us-0.22.zip"
 MODEL_DIR = "models/vosk-model-en-us-0.22"
