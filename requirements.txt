@@ -1,6 +1,6 @@
+requests
 vosk
 sounddevice
 pyttsx3
-pydub
-requests
+tqdm
 python-dateutil

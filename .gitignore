@@ -1,2 +1,5 @@
 models/
 __pycache__/
+tests/
+test.py
+.vscode/
