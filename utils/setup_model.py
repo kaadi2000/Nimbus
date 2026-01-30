@@ -64,6 +64,3 @@ def main():
     else:
         print("\n❌ Something went wrong: model verification failed.")
         sys.exit(1)
-
-if __name__ == "__main__":
-    main()
