@@ -9,7 +9,7 @@ venv/
 .git/
 .gitignore
 *.zip
-models/
+*.tar
 
 .DS_Store
 Thumbs.db

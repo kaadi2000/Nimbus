@@ -3,9 +3,8 @@
 Nimbus is a spoken dialogue system developed for an academic assignment.
 It supports weather queries and calendar management using Automatic Speech Recognition (ASR) and rule-based Natural Language Understanding (NLU).
 
-Due to hardware access limitations in Docker environments, Nimbus supports audio-file-based ASR inside Docker, as suggested by the course instructor.
+Due to hardware access limitations in Docker environments, Nimbus supports audio-file-based ASR inside Docker.
 
----
 
 ## Features
 
@@ -55,7 +54,6 @@ Nimbus/
 ├── Dockerfile
 └── README.md
 ```
----
 
 ## Supported Commands
 
@@ -87,7 +85,6 @@ This ensures:
 - Reproducible demonstrations
 - No dependency on host audio hardware
 
----
 
 ## File Mode (Recommended for Docker)
 
@@ -100,7 +97,6 @@ In File mode, a numbered menu of prerecorded commands is shown.
 The user selects a number to execute the corresponding audio command.
 A custom audio file path can also be provided.
 
----
 
 ## Audio Format Requirements
 
@@ -114,8 +110,6 @@ Example conversion using FFmpeg:
 ```
 ffmpeg -i input.m4a -ac 1 -ar 16000 -sample_fmt s16 output.wav
 ```
----
-
 ## Docker Usage
 
 Build the Docker image:
@@ -126,23 +120,11 @@ Optional: download the ASR model during build:
 ```
 docker build --build-arg DOWNLOAD_MODEL=true -t nimbus .
 ```
-Run Nimbus with demo audio files:
+Run Nimbus with:
 ```
-docker run -it --rm -v "$(pwd)/samples:/app/samples" nimbus
+docker run -it --rm nimbus
 ```
----
 
-## Deterministic Time for Demonstration
-
-To avoid system clock inconsistencies, Nimbus supports a fixed reference time.
-
-Run Docker with:
-```
-docker run -it --rm -e NIMBUS_NOW="2025-01-07 12:00" nimbus
-```
-This ensures that references such as today, tomorrow, and weekdays behave consistently during evaluation.
-
----
 
 ## Implementation Notes
 
@@ -152,7 +134,30 @@ This ensures that references such as today, tomorrow, and weekdays behave consis
 - Human-readable responses replace raw timestamps
 - Dialogue context is maintained across turns
 
+
+## Model Availability and Docker Behavior
+### Model Availability and Docker Behavior
+
+- When using the Docker container, the required ASR model (Vosk) is already included inside the image. No additional downloads are required at runtime.
+- When cloning the project directly from GitHub and running it locally, the ASR model is not included in the repository.
+On the first run, the system automatically downloads the required model before starting.
+When cloning the project directly from GitHub and running it locally, the ASR model is not included in the repository.
+On the first run, the system automatically downloads the required model before starting.
+
 ---
+
+## ASR and TTS Behavior in Docker
+Due to hardware and audio device access limitations in containerized environments:
+- Live ASR (microphone input) does not work inside Docker
+- Text-to-Speech (TTS) output does not work inside Docker
+
+Therefore, when running Nimbus inside a Docker container:
+- Type mode works
+- File mode (audio files) works
+- Speak mode (microphone) is disabled
+- TTS audio output is disabled (responses are shown as text)
+
+Outside Docker (local execution on the host machine), all modes including live ASR and TTS are supported.
 
 ## Known Limitations
 
