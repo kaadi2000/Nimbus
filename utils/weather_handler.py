@@ -9,7 +9,6 @@ from utils.nimbus_state import DAYS, context
 def extract_place(text: str) -> str | None:
     t = text.lower()
 
-    # "there" = reuse last place
     if re.search(r"\bthere\b", t):
         return context.get("last_place")
 
@@ -121,7 +120,7 @@ def handle_weather(text: str) -> str:
 
     n = extract_next_n_days(text)
     if n is not None:
-        items = data["forecast"][:n]
+        items = data["forecast"][1:1+n] if len(data["forecast"]) > 1 else data["forecast"][:n]
         parts = []
         for it in items:
             day = it["day"].strip()

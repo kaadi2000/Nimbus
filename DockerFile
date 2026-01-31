@@ -1,32 +1,23 @@
-# syntax=docker/dockerfile:1
 FROM python:3.11-slim
 
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+
 WORKDIR /app
-ENV PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
 
-# System deps:
-# - libportaudio2 / portaudio19-dev: needed by sounddevice
-# - libasound2 + alsa-utils: audio stack
-# - espeak-ng: common backend used by pyttsx3 on Linux
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libportaudio2 portaudio19-dev \
-    libasound2 alsa-utils \
-    espeak-ng \
-    ca-certificates \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    portaudio19-dev \
+    libasound2 \
+    libpulse0 \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps first (better layer caching)
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip && pip install -r /app/requirements.txt
 
-# Copy the app
-COPY . .
+COPY . /app
 
-# Optional: download Vosk model during build (BIG ~1.8GB)
-# Build with: docker build --build-arg DOWNLOAD_MODEL=true -t nimbus .
 ARG DOWNLOAD_MODEL=false
-RUN if [ "$DOWNLOAD_MODEL" = "true" ]; then python setup_model.py; fi
+RUN if [ "$DOWNLOAD_MODEL" = "true" ]; then python utils/setup_model.py; fi
 
-# Default run
 CMD ["python", "main.py"]

@@ -15,11 +15,6 @@ def is_add(text: str) -> bool:
     return any(p in t for p in ["add", "create", "schedule"]) and any(p in t for p in ["appointment", "meeting", "event"])
 
 def parse_add(text: str) -> dict | None:
-    """
-    Very basic v1:
-    - title: after 'titled' or after 'called'
-    - date/time: parse any date-ish substring with dateutil
-    """
     t = text.strip()
 
     title = None
@@ -27,14 +22,10 @@ def parse_add(text: str) -> dict | None:
     if m:
         title = m.group(2).strip()
 
-    # find datetime-ish chunk
-    # simplest: remove title phrase and try parsing remainder
-    # users will say: "for the 12th of January" or "on 2026-01-12 at 10"
     candidate = t
     if m:
         candidate = t.replace(m.group(0), " ")
 
-    # try parse
     try:
         dt = dateparser.parse(candidate, fuzzy=True, dayfirst=True)
     except Exception:
@@ -44,11 +35,10 @@ def parse_add(text: str) -> dict | None:
         title = "Appointment"
 
     if not dt:
-        # default: now + 1 hour (better than failing completely)
         dt = datetime.now().replace(second=0, microsecond=0)
 
     start_time = dt.replace(second=0, microsecond=0)
-    end_time = start_time  # v1: same time; you can add +1h later
+    end_time = start_time
 
     return {
         "title": title,

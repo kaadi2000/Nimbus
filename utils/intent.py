@@ -6,7 +6,6 @@ from utils.nimbus_state import DAYS
 
 
 def detect_intent(text: str) -> str:
-    """Very small intent router: weather vs calendar vs unknown."""
     t = text.lower()
 
     if any(

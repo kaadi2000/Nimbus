@@ -1,85 +1,171 @@
-# Nimbus – Voice & Text Assistant (Dockerized)
+# Nimbus – Spoken Dialogue System (Weather & Calendar)
 
-Nimbus is a lightweight command-line personal assistant written in Python. It supports text input by default and optional voice input/output. The project is fully Dockerized for easy setup and reproducibility.
+Nimbus is a spoken dialogue system developed for an academic assignment.
+It supports weather queries and calendar management using Automatic Speech Recognition (ASR) and rule-based Natural Language Understanding (NLU).
+
+Due to hardware access limitations in Docker environments, Nimbus supports audio-file-based ASR inside Docker, as suggested by the course instructor.
+
+---
 
 ## Features
 
-- Text-based interaction (always available)
-- Optional speech recognition (ASR) using Vosk
-- Text-to-speech (TTS) using pyttsx3
-- Weather information via external API
-- Calendar interaction
-- Docker support
+### Weather
+- Weather for today, tomorrow, and specific weekdays
+- Multi-day forecasts (e.g. “next three days”)
+- Context handling (e.g. “there” refers to the last mentioned city)
+- Yes/No questions (rain, snow, mist, etc.)
+
+### Calendar
+- Add appointments with title, date, and time
+- Query the next appointment
+- Update appointment location
+- Delete the previously created appointment
+- Delete appointments by title
+- Human-readable calendar responses
+
+### Interaction Modes
+- Type mode – text input
+- Speak mode – live microphone ASR
+- File mode – ASR using prerecorded audio files
+
+---
 
 ## Project Structure
 
-nimbus/
+```
+Nimbus/
+
+├── api/
+│   ├── weather.py
+│   └── calendar.py
+├── asr/
+│   ├── recognize.py
+│   └── recognize_file.py
+├── tts/
+│   └── speak.py
+├── utils/
+│   ├── intent.py
+│   ├── weather_handler.py
+│   ├── calendar_handler.py
+│   └── setup_model.py
+├── samples/
+├── models/
 ├── main.py
-├── setup.py
 ├── requirements.txt
 ├── Dockerfile
-├── api/
-│ └── **init**.py
-├── asr/
-│ └── **init**.py
-├── tts/
-│ └── **init**.py
-└── models/
+└── README.md
+```
+---
 
-## Requirements (Non-Docker)
+## Supported Commands
 
-- Python 3.10+
-- PortAudio
-- espeak / espeak-ng
+### Weather Commands
+- What will the weather be like today in Marburg
+- What will the weather be on Friday in Frankfurt
+- Will it rain there on Saturday
+- Will it snow there tomorrow
+- Next three days in Hamburg
 
-Install system dependencies (Debian/Ubuntu):
-sudo apt install portaudio19-dev espeak espeak-ng
+### Calendar Commands
+- Add an appointment titled party for tomorrow at ten pm
+- Where is my next appointment
+- Change the place for my appointment tomorrow to Room twelve
+- Delete the previously created appointment
+- Delete appointment party
 
-Install Python dependencies:
-pip install -r requirements.txt
+Contextual references such as there and previously created are resolved automatically.
 
-Run:
-python main.py
+---
 
-## Running with Docker
+## Audio File ASR (Docker-Compatible)
 
-Build the image:
+Docker containers cannot reliably access microphones or speakers due to hardware isolation.
+Nimbus therefore supports speech input via prerecorded audio files when running inside Docker.
+
+This ensures:
+- Stable execution
+- Reproducible demonstrations
+- No dependency on host audio hardware
+
+---
+
+## File Mode (Recommended for Docker)
+
+When running Nimbus, select File mode:
+
+```
+Modes: [T]ype, [S]peak, [F]ile, [Q]uit
+```
+In File mode, a numbered menu of prerecorded commands is shown.
+The user selects a number to execute the corresponding audio command.
+A custom audio file path can also be provided.
+
+---
+
+## Audio Format Requirements
+
+All audio files must be:
+- WAV format
+- Mono channel
+- 16-bit PCM
+- 16 kHz sample rate
+
+Example conversion using FFmpeg:
+```
+ffmpeg -i input.m4a -ac 1 -ar 16000 -sample_fmt s16 output.wav
+```
+---
+
+## Docker Usage
+
+Build the Docker image:
+```
 docker build -t nimbus .
+```
+Optional: download the ASR model during build:
+```
+docker build --build-arg DOWNLOAD_MODEL=true -t nimbus .
+```
+Run Nimbus with demo audio files:
+```
+docker run -it --rm -v "$(pwd)/samples:/app/samples" nimbus
+```
+---
 
-Run (text mode):
-docker run -it nimbus
+## Deterministic Time for Demonstration
 
-## Voice Mode in Docker (Linux)
+To avoid system clock inconsistencies, Nimbus supports a fixed reference time.
 
-docker run -it \
- --device /dev/snd \
- -v $(pwd)/models:/app/models \
- nimbus
+Run Docker with:
+```
+docker run -it --rm -e NIMBUS_NOW="2025-01-07 12:00" nimbus
+```
+This ensures that references such as today, tomorrow, and weekdays behave consistently during evaluation.
 
-## ASR Model (Vosk)
+---
 
-Download the Vosk English model manually:
-mkdir -p models
-cd models
-wget https://alphacephei.com/vosk/models/vosk-model-en-us-0.22.zip
-unzip vosk-model-en-us-0.22.zip
+## Implementation Notes
 
-Expected path:
-models/vosk-model-en-us-0.22/
+- ASR implemented using Vosk
+- NLU implemented using rule-based parsing
+- Calendar intent resolution prioritizes specific commands over general ones
+- Human-readable responses replace raw timestamps
+- Dialogue context is maintained across turns
 
-If the model is missing, Nimbus automatically falls back to text mode.
+---
 
-## Configuration
+## Known Limitations
 
-- DOWNLOAD_MODEL=false (default)
-  Prevents downloading large ASR models during Docker build.
+- Live microphone ASR is not supported inside Docker
+- Calendar descriptions are optional and not parsed
+- Time parsing relies on spoken number normalization (e.g. “ten p m”)
 
-## Notes
+---
 
-- Voice input requires microphone access.
-- Docker Desktop on Windows/macOS supports text mode only.
-- Speech recognition works reliably on Linux with /dev/snd access.
+## Conclusion
 
-## License
-
-MIT License
+Nimbus demonstrates a robust spoken dialogue system with:
+- Multi-turn context handling
+- Weather and calendar domain integration
+- Docker-compatible ASR via audio files
+- Clean and modular architecture

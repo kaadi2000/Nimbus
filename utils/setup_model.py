@@ -3,10 +3,6 @@ import sys
 import requests
 from tqdm import tqdm
 import zipfile
-import logging
-
-# Add logging configuration later especially for verification steps. 
-# I believe print statements are sufficient for now but from user perspective logging would be better.
 
 MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-en-us-0.22.zip"
 MODEL_DIR = "models/vosk-model-en-us-0.22"
@@ -38,7 +34,6 @@ def extract_model():
         zip_ref.extractall("models")
     print("✅ Extraction complete.")
 
-    # Clean up zip file
     try:
         os.remove(ZIP_PATH)
         print("🧹 Clean-up done — deleted downloaded zip file.")
@@ -54,11 +49,9 @@ def main():
         print(f"✅ Model found at '{MODEL_DIR}'.")
         return
 
-    # Model not found, proceed to download and extract
     download_model()
     extract_model()
 
-    # Verify again after extraction
     if verify_model():
         print(f"\n🎉 Model setup successful! Ready to use at '{MODEL_DIR}'.")
     else:
