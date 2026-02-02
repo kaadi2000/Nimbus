@@ -96,7 +96,7 @@ def main() -> None:
                 tts.say(reply)
                 continue
 
-            print("📝 ASR heard:", text)
+            print(" ASR heard:", text)
             if not text:
                 reply = "Sorry, I didn’t catch that in the audio."
                 print("Bot:", reply)
@@ -105,10 +105,10 @@ def main() -> None:
 
         elif mode == "s":
             if asr is None:
-                print("❌ ASR isn't available. Use Type mode.")
+                print(" ASR isn't available. Use Type mode.")
                 continue
             text = asr.listen_push_to_talk()
-            print("📝 ASR heard:", text)
+            print(" ASR heard:", text)
             if not text:
                 reply = "Sorry, I didn’t catch that. Please try again."
                 print("Bot:", reply)

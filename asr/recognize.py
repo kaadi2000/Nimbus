@@ -90,14 +90,14 @@ class ASREngine:
             pass
 
     def listen_push_to_talk(self) -> str:
-        input("▶️ Press ENTER to start speaking...")
+        input("Press ENTER to start speaking...")
 
         self._reset_session()
 
         stop_event = threading.Event()
 
         def _wait_for_stop():
-            input("⏹️ Press ENTER to stop speaking... (or just pause)")
+            input("Press ENTER to stop speaking... (or just pause)")
             stop_event.set()
 
         stopper = threading.Thread(target=_wait_for_stop, daemon=True)
